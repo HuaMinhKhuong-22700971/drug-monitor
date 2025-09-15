@@ -1,20 +1,19 @@
-const mongoose = require('mongoose');//mongoose is a JS library that works with MongoDB
+const mongoose = require('mongoose'); // Mongoose là thư viện để làm việc với MongoDB
 
+const connectDb = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_STR, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-const connectDb = async () => {//an async function to prevent blocking
-    try{
-        const conn = await mongoose.connect(process.env.MONGO_STR, {//connect using connection string
-        	//outline features that would be used
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        })
+    console.log(`✅ Database successfully connected at host: ${conn.connection.host}, db: ${conn.connection.name}`);
+    return conn.connection;
+  } catch (err) {
+    console.error(`❌ Database connection error: ${err.message}`);
+    process.exit(1); // Dừng server nếu kết nối DB thất bại
+  }
+};
 
-        //Display on console if connection is successful
-        console.log(`Database successfully connected at ${conn.connection.host}`);
-    }catch(err){//catch errors
-        console.log(err);
-        process.exit(1);//exit from the process on error
-    }
-}
-
-module.exports = connectDb; //exports the connection function for use anywhere
+module.exports = connectDb;
+//exports the connection function for use anywhere

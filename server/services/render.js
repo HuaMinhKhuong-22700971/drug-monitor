@@ -1,55 +1,84 @@
-const axios = require('axios');//http client used for making client & server side http requests in node
-const PORT = process.env.PORT || 3100; //uses either what's in our env or 3100 as our port (you can use any unused port)
-const BASE_URI = process.env.BASE_URI || 'http://localhost'; //uses either what's in our env or 3100 as our port (you can use any unused port)
+const axios = require('axios');
+const PORT = process.env.PORT || 3100;
+const BASE_URI = process.env.BASE_URI || 'http://localhost';
 
-exports.home= function(req, res) {
-            res.render('index', { title: `Home`});
+// Helper: gọi API lấy tất cả thuốc
+async function fetchDrugs(params = {}) {
+  const response = await axios.get(`${BASE_URI}:${PORT}/api/drugs`, { params });
+  return response.data;
 }
 
-exports.addDrug =  function(req, res) {//this listens for a get request for "/add-drug" from any hyperlink
-  res.render('add_drug', { title: `Add Drug`}); //tells server to respond with add_drug.ejs (.ejs is optional)
+// Helper: render error page
+function renderError(res, message, err = {}) {
+  res.status(500).render('error', { message, error: err });
 }
 
-exports.updateDrug =  function(req, res) {
-    axios.get(`${BASE_URI}:${PORT}/api/drugs`, { params : { id : req.query.id }})//request a drug from the database using the id
-        .then(function(response){
-            res.render("update_drug", { drug : response.data, title: `Edit Drug`})//add drug data when rendering update form
-        })
-        .catch(err =>{
-            res.send(err);
-        })
-}
+// ---------- RENDER ROUTES ----------
 
-exports.manage= function(req, res) {
-    // Make a get request to /api/users
-    axios.get(`${BASE_URI}:${PORT}/api/drugs`)//get request to pull drugs
-        .then(function(response){
-            res.render('manage', { drugs : response.data, title: 'Manage drug info' });// response from API request stored as drugs to display on manage.ejs
-        })
-        .catch(err =>{
-            res.send(err);
-        })
-}
+// Home page
+exports.home = (req, res) => {
+  res.render('index', { title: 'Home' });
+};
 
-exports.dosage= function(req, res) {
-    // Make a get request to /api/users
-    axios.get(`${BASE_URI}:${PORT}/api/drugs`)//get request to pull drugs
-        .then(function(response){
-            res.render('dosage', { drugs : response.data, title: 'Check Dosage' });// response from API request stored as drugs to display on manage.ejs
-        })
-        .catch(err =>{
-            res.send(err);
-        })
-}
+// Add drug page
+exports.addDrug = (req, res) => {
+  res.render('add_drug', { title: 'Add Drug' });
+};
 
-exports.purchase= function(req, res) {
-    // Make a get request to /api/users
-    axios.get(`${BASE_URI}:${PORT}/api/drugs`)//get request to pull drugs
-        .then(function(response){
-            res.render('purchase', { drugs : response.data, title: 'Purchase Drugs' });// response from API request stored as drugs to display on manage.ejs
-        })
-        .catch(err =>{
-            res.send(err);
-        })
-}
+// Update drug page
+exports.updateDrug = async (req, res) => {
+  try {
+    const id = req.query.id;
+    if (!id) return res.redirect('/manage');
 
+    const drug = await fetchDrugs({ id });
+
+    if (!drug || Object.keys(drug).length === 0) {
+      return res.status(404).render('error', { 
+        message: `Drug with id ${id} not found`, 
+        error: {} 
+      });
+    }
+
+    res.render('update_drug', { 
+      drug, 
+      title: 'Edit Drug' 
+    });
+  } catch (err) {
+    console.error("Error in render.updateDrug:", err.message);
+    renderError(res, 'Unable to load update page', err);
+  }
+};
+
+// Manage drugs page
+exports.manage = async (req, res) => {
+  try {
+    const drugs = await fetchDrugs();
+    res.render('manage', { drugs, title: 'Manage drug info' });
+  } catch (err) {
+    console.error("Error in render.manage:", err.message);
+    renderError(res, 'Unable to load manage page', err);
+  }
+};
+
+// Dosage page
+exports.dosage = async (req, res) => {
+  try {
+    const drugs = await fetchDrugs();
+    res.render('dosage', { drugs, title: 'Check Dosage' });
+  } catch (err) {
+    console.error("Error in render.dosage:", err.message);
+    renderError(res, 'Unable to load dosage page', err);
+  }
+};
+
+// Purchase page
+exports.purchase = async (req, res) => {
+  try {
+    const drugs = await fetchDrugs();
+    res.render('purchase', { drugs, title: 'Purchase Drugs' });
+  } catch (err) {
+    console.error("Error in render.purchase:", err.message);
+    renderError(res, 'Unable to load purchase page', err);
+  }
+};

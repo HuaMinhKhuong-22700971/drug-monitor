@@ -1,38 +1,73 @@
 <!-- add header -->
-<%- include('includes/_header') %>
+<%- include('includes/_header.ejs', { title: "Purchase" }) %>
 <!-- end header -->
+
 <!-- Main section -->
-<main id="main">
+<main id="main" class="container my-4">
 
-	<h2>Calculate Drugs to purchase</h2>
-	<p>For how many days do you want to purchase drugs?</p> <form id="drug_days"> <input type="number" id="days" value="30"> <button type="submit">Enter</button> </form>
+  <h2 class="mb-3">Calculate Drugs to Purchase</h2>
+  <p>For how many days do you want to purchase drugs?</p>
 
-	<table id="purchase_table">	
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Drug Name</th>
-				<th> Cards to Buy</th>
-				<th>Packs to Buy</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- Loop through drugs -->
-			<% for(let i = 0; i < drugs.length; i++) {%>
-			<% let days = 30; %>
-			<% let pills = days*drugs[i].perDay; %>
-			<tr>
-				<td><%= i + 1 %></td>
-				<td><%= drugs[i].name %></td>
-				<td><%= Math.ceil(pills/drugs[i].card) %> (<%= drugs[i].pack/drugs[i].card %> <% if (drugs[i].pack/drugs[i].card < 2) { %> card <%} else { %> cards <% } %> per pack)</td>
-				<td><%= Math.ceil(pills/drugs[i].pack) %></td>
-			</tr>
-			<% } %> <!--  End loop -->
-		</tbody>
-	</table>
+  <!-- Form nhập số ngày -->
+  <form action="/purchase/calculate" method="POST" class="mb-4 d-flex align-items-center">
+    <input 
+      type="number" 
+      name="days" 
+      value="<%= typeof days !== 'undefined' && days !== null ? days : 30 %>" 
+      min="1" 
+      max="90" 
+      class="form-control w-auto me-2" 
+      required 
+      aria-label="Number of days">
+    <button type="submit" class="btn btn-primary">Enter</button>
+  </form>
+
+  <!-- Hiển thị lỗi nếu có -->
+  <% if (locals.error) { %>
+    <div class="alert alert-danger" role="alert">
+      <%= error %>
+    </div>
+  <% } else if (drugs && drugs.length === 0) { %>
+    <p class="text-danger">No drugs available. Please add some first.</p>
+  <% } %>
+
+  <% if (drugs && drugs.length > 0) { %>
+  <table id="purchase_table" class="table table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Drug Name</th>
+        <th>Cards to Buy</th>
+        <th>Packs to Buy</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% drugs.forEach((drug, i) => { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= drug.name %></td>
+          <td>
+            <%= drug.cards || 0 %> 
+            (<%= drug.cardsPerPack || 'N/A' %> cards per pack)
+          </td>
+          <td><%= drug.packs || 0 %></td>
+          <td>
+            <form action="/purchase/create" method="POST" style="display:inline;">
+              <input type="hidden" name="drugId" value="<%= drug._id %>">
+              <input type="hidden" name="days" value="<%= days %>">
+              <button type="submit" class="btn btn-success btn-sm">Create Purchase</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+
 </main>
 <!-- End main section -->
+
 <!-- add footer -->
 <%- include('includes/_footer') %>
-<!-- end footer-->
-
+<!-- end footer -->

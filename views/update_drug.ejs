@@ -1,46 +1,96 @@
 <!-- add header -->
 <%- include('includes/_header') %>
 <!-- end header -->
+
 <!-- Main section -->
-<main id="main">
-  <a href="/manage">
-    <span><i class="fas fa-arrow-left"></i> All Drugs</span>
+<main id="main" class="container mt-4">
+  <a href="/manage" class="btn btn-secondary mb-3">
+    <i class="fas fa-arrow-left"></i> Back to All Drugs
   </a>
 
-  <h2>Edit <%= drug.name %></h2>
-<p>Use the below form to edit <%= drug.name %></p>
- <!-- Update drug form -->
- <form method="POST" id="update_drug">
-    <div class="container d-flex flex-column align-items-stretch">
-        <div class="row mb-3 form-group justify-content-center">             
-            <label for="name" class="col-3 col-form-label">Drug Name</label>
-            <input type="hidden" name="id" value="<%= drug._id %>">
-            <input type="text" name="name" value="<%= drug.name %>" placeholder="Drug Name" class="col-xs-8 col-md-4">
-        </div>
-        <div class="row mb-3 form-group justify-content-center">
-            <label for="card" class="col-3 col-form-label">Tablets per Card</label>
-            <input type="number" name="card" value="<%= drug.card %>" placeholder="Tablets per Card" min="1" max="500" class="col-xs-8 col-md-4">
-        </div>
-        <div class="row mb-3 form-group justify-content-center">
-            <label for="pack" class="col-3 col-form-label">Tablets per Pack</label>
-            <input type="number" name="pack" value="<%= drug.pack %>" placeholder="Tablets per Pack" min="1" max="500" class="col-xs-8 col-md-4">
-        </div>
-        <div class="row mb-3 form-group justify-content-center">
-            <label for="perDay" class="col-3 col-form-label">Taken per day</label>
-            <input type="number" name="perDay" value="<%= drug.perDay %>" placeholder="Taken per day" min="1" max="500" class="col-xs-8 col-md-4">
-        </div>
-        <div class="row mb-3 form-group justify-content-center">             
-            <label for="dosage" class="col-3 col-form-label">Dosage</label>
-            <input type="text" id="dosage" name="dosage" value="<%= drug.dosage %>" placeholder="Dosage" class="col-md-4 col-xs-8" required>
-        </div>
+  <h2 class="mb-3">Edit <%= drug.name %></h2>
+  <p>Update the information below for <strong><%= drug.name %></strong>.</p>
 
-        <div class="form-group">
-            <button type="submit">Edit Drug</button>
-        </div>
+  <!-- Update drug form -->
+  <form id="update_drug" method="POST">
+    <!-- hidden ID -->
+    <input type="hidden" name="id" value="<%= drug._id %>">
+
+    <div class="mb-3">
+      <label for="name" class="form-label">Drug Name</label>
+      <input 
+        type="text" 
+        id="name"
+        name="name" 
+        value="<%= drug.name %>" 
+        placeholder="Drug Name" 
+        class="form-control" 
+        required
+      >
     </div>
-</form>
+
+    <div class="mb-3">
+      <label for="card" class="form-label">Tablets per Card</label>
+      <input 
+        type="number" 
+        id="card"
+        name="card" 
+        value="<%= drug.card %>" 
+        placeholder="Tablets per Card" 
+        min="1" max="5000" 
+        class="form-control" 
+        required
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="pack" class="form-label">Tablets per Pack</label>
+      <input 
+        type="number" 
+        id="pack"
+        name="pack" 
+        value="<%= drug.pack %>" 
+        placeholder="Tablets per Pack" 
+        min="1" max="500" 
+        class="form-control" 
+        required
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="perDay" class="form-label">Taken per Day</label>
+      <input 
+        type="number" 
+        id="perDay"
+        name="perDay" 
+        value="<%= drug.perDay %>" 
+        placeholder="Taken per Day" 
+        min="1" max="90" 
+        class="form-control" 
+        required
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="dosage" class="form-label">Dosage</label>
+      <input 
+        type="text" 
+        id="dosage" 
+        name="dosage" 
+        value="<%= drug.dosage %>" 
+        placeholder="Format: 1-morning,2-afternoon,1-night" 
+        class="form-control" 
+        required
+      >
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-save"></i> Update Drug
+    </button>
+  </form>
 </main>
 <!-- End main section -->
+
 <!-- add footer -->
 <%- include('includes/_footer') %>
 <!-- end footer-->
